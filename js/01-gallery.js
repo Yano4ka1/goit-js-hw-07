@@ -1,5 +1,6 @@
 
-// Створи галерею з можливістю кліку по її елементах і перегляду повнорозмірного зображення у модальному вікні. 
+// Створи галерею з можливістю кліку по її елементах і перегляду повнорозмірного зображення у
+//  модальному вікні. 
 
 // 1. Створення і рендер розмітки на підставі масиву даних galleryItems 
 //      і наданого шаблону елемента галереї.
@@ -40,3 +41,67 @@ import { galleryItems } from './gallery-items.js';
 // Change code below this line
 
 console.log(galleryItems);
+
+
+const galleryRef = document.querySelector('.gallery');
+
+galleryRef.insertAdjacentHTML('beforeend',createGalleryMarkup(galleryItems))
+
+function createGalleryMarkup(galleryItems) {
+
+  const galleryMarkup = galleryItems
+    .map(item => {
+
+      return `
+      <div class="gallery__item">
+        <a class="gallery__link" href="${item.original}">
+          <img
+            class="gallery__image"
+            src="${item.preview}"
+            data-source="${item.original}"
+          alt="${item.description}"
+          />
+        </a>
+      </div>`
+    })
+  .join('')
+
+  return galleryMarkup;
+}
+
+
+galleryRef.addEventListener('click', onGalleryClick);
+
+function onGalleryClick(evn) {
+  evn.preventDefault();
+
+  if (!evn.target.classList.contains('gallery__image')) {
+    return
+  };
+
+  openBasicLightboxImage(evn.target.dataset.source);
+}
+
+function openBasicLightboxImage(image) {
+  
+  const basicLightboxImage = basicLightbox.create(`
+        <img width="1400" height="900" src="${image}">
+        `, {
+      onShow: () => {
+        document.addEventListener('keydown', onEcsKeyDown);
+        document.body.classList.add('modal-open');
+      },
+      onClose: () => {
+        document.removeEventListener('keydown', onEcsKeyDown);
+        document.body.classList.remove('modal-open');
+      }
+  })
+
+    function onEcsKeyDown(evn) {
+      if (evn.code === "Escape") {
+        basicLightboxImage.close()
+      }
+  }
+
+  basicLightboxImage.show()
+}
